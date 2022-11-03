@@ -26,7 +26,7 @@ module.exports = {
 
             CREATE TABLE cities (
                 city_id SERIAL PRIMARY KEY,
-                name VARCHAR(60),
+                name VARCHAR,
                 rating INT,
                 country_id INT REFERENCES countries(country_id)
             );
@@ -247,15 +247,47 @@ module.exports = {
     },
 
     createCity: (req, res) => {
-        let {
+        const {
             name,
             rating,
             countryId
         } = req.body
 
         sequelize.query(`
-            INSERT INTO cities (name, rating, countryId)
-            VALUES (${name}, ${rating}, ${countryId})
+            INSERT INTO cities (name, rating, country_Id)
+            VALUES ('${name}', ${rating}, ${countryId})
+        `)
+        .then((dbRes) => {
+            res.send(dbRes[0])
+       })
+       .catch((err) => {
+        console.log(err)
+        res.send('sequelize error')
+       })
+    },
+
+    getCities: (req, res) => {
+        sequelize.query (`
+            SELECT cities.city_id, cities.name AS city, cities.rating, countries.country_id, countries.name AS country
+            FROM cities
+            JOIN countries
+            ON cities.country_id = countries.country_id
+            ORDER BY cities.rating DESC
+        `)
+        .then((dbRes) => {
+            res.send(dbRes[0])
+       })
+       .catch((err) => {
+        console.log(err)
+        res.send('sequelize error')
+       })
+    },
+
+    deleteCity: (req, res) => {
+        const {id} = req.params
+        sequelize.query (`
+            DELETE FROM cities 
+            WHERE ${id} = cities.city_id
         `)
         .then((dbRes) => {
             res.send(dbRes[0])
