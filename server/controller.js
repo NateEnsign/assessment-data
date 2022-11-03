@@ -12,8 +12,6 @@ dialectOptions: {
 }
 })
 
-//hope this will work
-
 
 module.exports = {
     seed: (req, res) => {
